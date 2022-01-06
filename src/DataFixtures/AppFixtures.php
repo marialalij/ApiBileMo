@@ -52,7 +52,7 @@ class AppFixtures extends Fixture
         for ($i = 0; $i < 25; $i++) {
             $product = new Product;
 
-            $product->setBrand($faker->randomElement(['Apple', 'Samsung', 'Google', 'OnePlus', 'Huawei']))
+            $product->setBrand($faker->randomElement(['Apple', 'Samsung', 'xplus', 'htc', 'Huawei']))
                 ->setModel($faker->word() . ' ' . $faker->numberBetween(6, 12))
                 ->setPrice($faker->randomFloat(2, 250, 1300))
                 ->setColor($faker->colorName());

@@ -8,7 +8,7 @@ nelmio_api_doc:
               description: API over HTTPS
         info:
             title: API Bilemo
-            description: Jeux de données BileMo (produits + utilisateurs liés au client)
+            description: Jeux de données BileMo
             version: 1.0.0
         components:
             securitySchemes:
