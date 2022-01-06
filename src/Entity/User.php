@@ -45,8 +45,8 @@ class User
      * @Groups({"Default","user:read", "user:write"})
      *
      * @OA\Property(description="Name of the user", type="string")
-     * @Assert\Length(min=4, minMessage="Name must have {{ limit }} caracters")
-     * @Assert\NotBlank(message="Name is missing")
+     * @Assert\Length(min=3, minMessage="le nome doit avoir {{ limit }} de cararctere")
+     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $name;
 
@@ -55,8 +55,8 @@ class User
      * @Groups({"Default","user:read", "user:write"})
      *
      * @OA\Property(description="firstName of the user", type="string")
-     * @Assert\Length(min=4, minMessage="firstName must have {{ limit }} caracters")
-     * @Assert\NotBlank(message="firstName is missing")
+     * @Assert\Length(min=3, minMessage="firstName doit avoir {{ limit }} caractere")
+     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $firstName;
 
@@ -66,7 +66,7 @@ class User
      *
      * @OA\Property(description="LastName of the user", type="string")
      * @Assert\Length(min=4, minMessage="LastName must have {{ limit }} caracters")
-     * @Assert\NotBlank(message="LastName is missing")
+     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $lastName;
 
@@ -75,7 +75,7 @@ class User
      * @Groups({"Default","user:read", "user:write"})
      *
      * @OA\Property(type="string")
-     * @Assert\NotBlank(message="Email is missing")
+     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $email;
 
@@ -112,7 +112,7 @@ class User
 
     public function setLastName(string $lastName): self
     {
-        $this->firstName = $lastName;
+        $this->lastName = $lastName;
 
         return $this;
     }

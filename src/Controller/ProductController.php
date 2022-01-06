@@ -38,4 +38,31 @@ class ProductController extends AbstractController
 
         return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
+
+    /**
+     * la liste des produits
+     *
+     * @OA\Get(
+     *     path="/api/products",
+     *     summary="Get products list",
+     *     @OA\Response(
+     *          response=200,
+     *     description="OK",
+     *     @OA\JsonContent(ref=@Model(type=Product::class)),
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=404, description="not found"),
+     *     @OA\Response(response=500, description="Internal error"),
+     * ),
+     * @OA\Tag(name="Product")
+     * @param ProductRepository $repo
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    public function listproduct(ProductRepository $repo, SerializerInterface $serializer): JsonResponse
+    {
+        $liste = $repo->findAll();
+        $jsonContent = $serializer->serialize($liste, 'json', SerializationContext::create()->setGroups(["Default", "product:read"]));
+        return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
+    }
 }
