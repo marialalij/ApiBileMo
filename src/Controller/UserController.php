@@ -55,4 +55,49 @@ class UserController extends AbstractController
         $jsonContent = $serializer->serialize($repository->findBy(['id' => $user->getId()]), 'json', SerializationContext::create()->setGroups(['Default', 'users:list']));
         return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
+
+    /**
+     * Create one user of a Client
+     *
+     * @OA\Post(
+     *     path="/api/users",
+     *     summary="Get Users detail",
+     *     @OA\RequestBody(description="Create new user", required=true, @OA\JsonContent(ref=@Model(type=User::class))),
+     *     @OA\Response(
+     *          response=201,
+     *     description="OK",
+     *     @OA\JsonContent(ref=@Model(type=User::class)),
+     *     ),
+     *     @OA\Response(response=400, description="Bad Request"),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=500, description="Internal error"),
+     * ),
+     * @OA\Tag(name="User")
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param SerializerInterface $serializer
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function add(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator): JsonResponse
+    {
+        $data = $request->getContent();
+        /** @var User $user */
+        $user = $serializer->deserialize($data, User::class, 'json');
+        $errors = $validator->validate($user);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+        $user->setCustomer($this->getUser());
+        $manager->persist($user);
+        $manager->flush();
+        return new JsonResponse(
+            $serializer->serialize($user, "json", SerializationContext::create()->setGroups(['Default', 'users:list', 'user:read'])),
+            JsonResponse::HTTP_CREATED,
+            ["Location" => $urlGenerator->generate("user_detail", ["id" => $user->getid()])],
+            true
+        );
+    }
 }
