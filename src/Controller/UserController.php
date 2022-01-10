@@ -100,4 +100,33 @@ class UserController extends AbstractController
             true
         );
     }
+
+    /**
+     * Delete one User of a Client
+     *
+     * @OA\Delete(
+     *     path="/api/users/{id}",
+     *     summary="Get Users detail",
+     *     @OA\Parameter(in="path", name="id", required=true, @OA\Schema(type="string"), @OA\Examples(example="int", value="1",summary="An int value")),
+     *     @OA\Response(
+     *          response=204,
+     *     description="Success",
+     *     @OA\JsonContent(ref=@Model(type=User::class)),
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="not found"),
+     *     @OA\Response(response=500, description="Internal error"),
+     * ),
+     * @OA\Tag(name="User")
+     * @param User $user
+     * @param EntityManagerInterface $manager
+     * @return JsonResponse
+     */
+    public function delete(User $user, EntityManagerInterface $manager)
+    {
+        $manager->remove($user);
+        $manager->flush();
+        return $this->json("", Response::HTTP_NO_CONTENT);
+    }
 }
