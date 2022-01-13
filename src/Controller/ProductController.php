@@ -44,10 +44,6 @@ class ProductController extends AbstractController
      * )
      * @Cache(maxage="3600", public=true, mustRevalidate=true)
      *
-     * @OA\Tag(name="Product")
-     * @param Product $product
-     * @param SerializerInterface $serializer
-     * @return JsonResponse
      */
     public function showProduct(Product $product, SerializerInterface $serializer): JsonResponse
     {
@@ -55,7 +51,6 @@ class ProductController extends AbstractController
         if (empty($jsonContent)) {
             throw new NotFoundHttpException();
         }
-
         return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
 
@@ -79,11 +74,6 @@ class ProductController extends AbstractController
      *     description="Product not found"
      * )
      * @Cache(maxage="3600", public=true, mustRevalidate=true)
-     * 
-     * @OA\Tag(name="Product")
-     * @param ProductRepository $repo
-     * @param SerializerInterface $serializer
-     * @return JsonResponse
      */
     public function listproduct(ProductRepository $repo, SerializerInterface $serializer, Request $request, PaginatorInterface $paginator): JsonResponse
     {

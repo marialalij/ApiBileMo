@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use Throwable;
-use JsonException;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,10 +47,6 @@ class UserController extends AbstractController
      * )
      * @OA\Tag(name="User")
      *
-     * @param User $user
-     * @param UserRepository $repository
-     * @param SerializerInterface $serializer
-     * @return JsonResponse
      */
     public function show(User $user, UserRepository $repository, SerializerInterface $serializer): JsonResponse
     {
@@ -90,12 +84,11 @@ class UserController extends AbstractController
 
 
     /**
-     * Return list Users of a Client
-     * @Route("/api/users", name="api_user_list", methods={"GET"})
-     * @OA\GET(summary="add a user")
+     * @Route("/api/users", name="api_users_list", methods={"GET"})
+     * @OA\Get(summary="Get list of BileMo users")
      * @OA\Response(
      *     response=JsonResponse::HTTP_OK,
-     *     description="list of users"
+     *     description="Returns the list of users"
      * )
      * @OA\Response(
      *     response=JsonResponse::HTTP_BAD_REQUEST,
@@ -107,14 +100,12 @@ class UserController extends AbstractController
      * )
      * @OA\Response(
      *     response=JsonResponse::HTTP_NOT_FOUND,
-     *     description="User not found"
+     *     description="Product not found"
      * )
+     * 
+     * @Cache(maxage="3600", public=true, mustRevalidate=true)
      *
-     * @param UserRepository $repository
-     * @param SerializerInterface $serializer
-     * @param Request $request
-     * @param PaginatorInterface $paginator
-     * @return JsonResponse
+     * @OA\Tag(name="User")
      */
     public function listOfUsers(UserRepository $repository, SerializerInterface $serializer, Request $request, PaginatorInterface $paginator): JsonResponse
     {
@@ -174,10 +165,6 @@ class UserController extends AbstractController
      *     )
      * )
      * @OA\Tag(name="User")
-     * 
-     * @param SerializerInterface $serializer
-     * @param Request $request
-     * @param User $user
      */
     public function update(User $user, Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
@@ -219,13 +206,6 @@ class UserController extends AbstractController
      *     description="User not found"
      * )
      * @OA\Tag(name="User")
-     *
-     * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param SerializerInterface $serializer
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param ValidatorInterface $validator
-     * @return JsonResponse
      */
     public function add(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
