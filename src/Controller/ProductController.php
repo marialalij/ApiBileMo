@@ -58,4 +58,37 @@ class ProductController extends AbstractController
 
         return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
+
+    /**
+     * @Route("/api/products", name="api_product_list", methods={"GET"})
+     * @OA\Get(summary="Get list of BileMo products")
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Returns the list of products"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Bad Json syntax or incorrect data"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_UNAUTHORIZED,
+     *     description="Unauthorized request"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="Product not found"
+     * )
+     * @Cache(maxage="3600", public=true, mustRevalidate=true)
+     * 
+     * @OA\Tag(name="Product")
+     * @param ProductRepository $repo
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    public function listproduct(ProductRepository $repo, SerializerInterface $serializer, Request $request, PaginatorInterface $paginator): JsonResponse
+    {
+        $liste = $paginator->paginate($repo->findAll(), $request->query->getInt('page', 1), 5);
+        $jsonContent = $serializer->serialize($liste, 'json', SerializationContext::create()->setGroups(["Default", "product:read"]));
+        return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
+    }
 }
