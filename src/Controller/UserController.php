@@ -197,4 +197,53 @@ class UserController extends AbstractController
             true
         );
     }
+
+
+    /**
+     * @Route("/api/users", name="api_user_add", methods={"POST"})
+     * @OA\Post(summary="add a user")
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Update a user and returns it"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Bad Json syntax or incorrect data"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_UNAUTHORIZED,
+     *     description="Unauthorized request"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="User not found"
+     * )
+     * @OA\Tag(name="User")
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param SerializerInterface $serializer
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function add(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+        $data = $request->getContent();
+        /** @var User $user */
+        $user = $serializer->deserialize($data, User::class, 'json');
+        $errors = $validator->validate($user);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+        $user->setCustomer($this->getUser());
+        $manager->persist($user);
+        $manager->flush();
+        return new JsonResponse(
+            $serializer->serialize($user, "json", SerializationContext::create()->setGroups(['Default', 'users:list', 'user:read'])),
+            JsonResponse::HTTP_CREATED,
+            [],
+            true
+        );
+    }
 }
