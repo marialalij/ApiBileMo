@@ -123,4 +123,78 @@ class UserController extends AbstractController
         $jsonContent = $serializer->serialize($liste, 'json', SerializationContext::create()->setGroups(['Default', 'users:list']));
         return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
+
+    /**
+     * @Route("/api/users/{id}", name="api_user_update", methods={"PUT"})
+     * @OA\Put(summary="Update a user")
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Update a user and returns it"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Bad Json syntax or incorrect data"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_UNAUTHORIZED,
+     *     description="Unauthorized request"
+     * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="User not found"
+     * )
+     * @OA\RequestBody(
+     *     description="The user data you want to update. Use empty values for unchanged data (e.g. ""password"": """").",
+     *     required=true,
+     *     @OA\MediaType(
+     *         mediaType="application/Json",
+     *         @OA\Schema(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="name",
+     *                 description="User's name",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="first_name",
+     *                 description="User's first name",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="last_name",
+     *                 description="User's last name",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="email",
+     *                 description="User's email address",
+     *                 type="string"
+     *             )
+     *         )
+     *     )
+     * )
+     * @OA\Tag(name="User")
+     * 
+     * @param SerializerInterface $serializer
+     * @param Request $request
+     * @param User $user
+     */
+    public function update(User $user, Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    {
+        $data = $request->getContent();
+        /** @var User $user */
+        $updat = $serializer->deserialize($data, User::class, 'json');
+        if ($updat->getFirstName()) $user->setFirstName($updat->getFirstName());
+        if ($updat->getLastName()) $user->setLastName($updat->getLastName());
+        if ($updat->getEmail()) $user->setEmail($updat->getEmail());
+        if ($updat->getName()) $user->setName($updat->getName());
+        $entityManager->flush();
+
+        return new JsonResponse(
+            $serializer->serialize($user, "json", SerializationContext::create()->setGroups(['Default', 'users:list', 'user:read'])),
+            JsonResponse::HTTP_CREATED,
+            [],
+            true
+        );
+    }
 }
