@@ -10,10 +10,7 @@ use OpenApi\Annotations as OA;
 use JMS\Serializer\Annotation\Groups as Groups;
 use JMS\Serializer\Annotation\Exclude;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+
 
 /**
  * @Serializer\XmlRoot("User")
@@ -21,10 +18,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  * @Hateoas\Relation("delete", href = "expr('/api/users/' ~ object.getId())")
  * @Hateoas\Relation("list")
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource
- * @ApiFilter(searchFilter::class)
- * @ApiFilter(OrderFilter::class)
- * 
  * @OA\Schema(title="User", description="User class")
  */
 class User
@@ -34,56 +27,39 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     *
-     * @OA\Property(type="integer")
-     * @Exclude
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"Default","user:read", "user:write"})
-     *
-     * @OA\Property(description="Name of the user", type="string")
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\Length(min=3, minMessage="le nome doit avoir {{ limit }} de cararctere")
      * @Assert\NotBlank(message="champ non renseigné")
+     * @Groups({"Default","user:read", "user:write"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"Default","user:read", "user:write"})
-     *
-     * @OA\Property(description="firstName of the user", type="string")
-     * @Assert\Length(min=3, minMessage="firstName doit avoir {{ limit }} caractere")
-     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"Default","user:read", "user:write"})
-     *
-     * @OA\Property(description="LastName of the user", type="string")
-     * @Assert\Length(min=4, minMessage="LastName must have {{ limit }} caracters")
-     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"Default","user:read", "user:write"})
-     *
-     * @OA\Property(type="string")
-     * @Assert\NotBlank(message="champ non renseigné")
      */
     private $email;
 
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
-     *
-     * @OA\Property(description="Customer of the user")
+     * 
      * @Exclude
      */
     private $customer;

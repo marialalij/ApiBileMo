@@ -9,21 +9,16 @@ use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Annotations as OA;
 use JMS\Serializer\Annotation\Groups as Groups;
 use JMS\Serializer\Annotation\Exclude;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 /**
  * @Serializer\XmlRoot("Product")
  * @Hateoas\Relation("self", href = "expr('/api/products/' ~ object.getId())")
  * @ORM\Entity(repositoryClass=ProductRepository::class)
- * @ApiResource
- * @ApiFilter(searchFilter::class)
- * @ApiFilter(OrderFilter::class)
- * 
  */
+
 class Product
 {
     /**
@@ -31,42 +26,33 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     *
-     * @OA\Property(description="l'identifiant est unique", type="integer")
-     *
-     * @Exclude
+     * @Groups({"product:list"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="You must provide a product brand")
+     * @Assert\Length(min=3, minMessage="The bran must contain at least {{ limit }} characters")
      * @Groups({"product:read", "product:detail"})
-     *
-     * @OA\Property(description="brand du produit", type="string")
      */
     private $brand;
 
     /**
      * @ORM\Column(type="decimal", precision=6, scale=2)
      * @Groups({"product:read", "product:detail"})
-     *
-     * @OA\Property(description="prix du produit", type="string")
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"product:read", "product:detail"})
-     *
-     * @OA\Property(description="modele du produit", type="string")
      */
     private $model;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"product:read", "product:detail"})
-     *
-     * @OA\Property(description="Coleur du produit", type="string")
      */
     private $color;
 

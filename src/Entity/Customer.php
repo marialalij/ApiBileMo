@@ -23,9 +23,6 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * 
-     * @OA\Property(description="Unique identifier of the customer", type="integer")
-     * @Exclude
      */
     private $id;
 
@@ -33,7 +30,6 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"Default","users:list"})
      *
-     * @OA\Property(description="Username of the customer", type="string")
      */
     private $username;
 
@@ -46,14 +42,11 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      * @ORM\Column(type="string")
      * 
-     * @OA\Property(description="Password of the customer", type="string")
      */
     private $password;
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer")
-     * @Groups({"Default","users:list"})
-     *
      * @OA\Property(description="Users of the customer")
      */
     private $users;

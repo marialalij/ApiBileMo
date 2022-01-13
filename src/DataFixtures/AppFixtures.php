@@ -34,12 +34,12 @@ class AppFixtures extends Fixture
     public function Customers()
     {
         $faker = Factory::create('fr_FR');
-        $providers = ["free", "orange", "sfr", "clc"];
+        $names = ["free", "orange", "sfr", "clc"];
 
-        foreach ($providers as $provider) {
+        foreach ($names as $name) {
             $customer = new Customer();
-            $customer->setUsername($provider)
-                ->setPassword($this->passwordEncoder->encodePassword($customer, $provider))
+            $customer->setUsername($name)
+                ->setPassword($this->passwordEncoder->encodePassword($customer, $name))
                 ->setRoles(["USER"]);
 
             $this->manager->persist($customer);
