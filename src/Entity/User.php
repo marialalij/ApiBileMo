@@ -59,8 +59,8 @@ class User
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
-     * 
-     * @Exclude
+     * @Groups({"Default","users:list"})
+     *
      */
     private $customer;
 

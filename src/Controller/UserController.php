@@ -8,18 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
 use Symfony\Component\Routing\Annotation\Route;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
-use Nelmio\ApiDocBundle\Annotation;
-use FOS\RestBundle\Controller\Annotations\View;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
@@ -27,6 +22,9 @@ class UserController extends AbstractController
 {
 
     /**
+     * 
+     * show details of a user
+     * 
      * @Route("/api/users/{id}", name="api_user_detail", methods={"GET"})
      * @OA\Get(summary="details of a user")
      * @OA\Response(
@@ -45,7 +43,15 @@ class UserController extends AbstractController
      *     response=JsonResponse::HTTP_NOT_FOUND,
      *     description="User not found"
      * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+     *     description="HTTP_INTERNAL_SERVER_ERROR request"
+     * )
+     *
+     * @Cache(maxage="3600", public=true, mustRevalidate=true)
+     * 
      * @OA\Tag(name="User")
+     * 
      *
      */
     public function show(User $user, UserRepository $repository, SerializerInterface $serializer): JsonResponse
@@ -55,6 +61,9 @@ class UserController extends AbstractController
     }
 
     /**
+     * 
+     * Delete a user
+     * 
      * @Route("/api/users/{id}", name="api_user_delete", methods={"DELETE"})
      * @OA\Delete(summary="Delete a user")
      * @OA\Response(
@@ -69,11 +78,13 @@ class UserController extends AbstractController
      *     response=JsonResponse::HTTP_NOT_FOUND,
      *     description="User not found"
      * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+     *     description="HTTP_INTERNAL_SERVER_ERROR request"
+     * )
      * @OA\Tag(name="User")
      *
-     * @param User $user
-     * @param EntityManagerInterface $manager
-     * @return JsonResponse
+     * @Cache(maxage="3600", public=true, mustRevalidate=true)
      */
     public function delete(User $user, EntityManagerInterface $manager)
     {
@@ -84,6 +95,8 @@ class UserController extends AbstractController
 
 
     /**
+     * show list of users
+     * 
      * @Route("/api/users", name="api_users_list", methods={"GET"})
      * @OA\Get(summary="Get list of BileMo users")
      * @OA\Response(
@@ -102,6 +115,10 @@ class UserController extends AbstractController
      *     response=JsonResponse::HTTP_NOT_FOUND,
      *     description="Product not found"
      * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+     *     description="HTTP_INTERNAL_SERVER_ERROR request"
+     * )
      * 
      * @Cache(maxage="3600", public=true, mustRevalidate=true)
      *
@@ -110,12 +127,14 @@ class UserController extends AbstractController
     public function listOfUsers(UserRepository $repository, SerializerInterface $serializer, Request $request, PaginatorInterface $paginator): JsonResponse
     {
 
-        $liste = $paginator->paginate($repository->findBy(["customer" => $this->getUser()]), $request->query->getInt('page', 1), 5);
+        $liste = $paginator->paginate($repository->findBy(["customer" => $this->getUser()]), $request->query->getInt('page', 1), 3);
         $jsonContent = $serializer->serialize($liste, 'json', SerializationContext::create()->setGroups(['Default', 'users:list']));
         return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
 
     /**
+     * Update user
+     * 
      * @Route("/api/users/{id}", name="api_user_update", methods={"PUT"})
      * @OA\Put(summary="Update a user")
      * @OA\Response(
@@ -134,8 +153,12 @@ class UserController extends AbstractController
      *     response=JsonResponse::HTTP_NOT_FOUND,
      *     description="User not found"
      * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+     *     description="HTTP_INTERNAL_SERVER_ERROR request"
+     * )
      * @OA\RequestBody(
-     *     description="The user data you want to update. Use empty values for unchanged data (e.g. ""password"": """").",
+     *     description="The user data you want to update",
      *     required=true,
      *     @OA\MediaType(
      *         mediaType="application/Json",
@@ -164,6 +187,7 @@ class UserController extends AbstractController
      *         )
      *     )
      * )
+     * @Cache(maxage="3600", public=true, mustRevalidate=true)
      * @OA\Tag(name="User")
      */
     public function update(User $user, Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
@@ -187,6 +211,9 @@ class UserController extends AbstractController
 
 
     /**
+     * 
+     * add new user
+     * 
      * @Route("/api/users", name="api_user_add", methods={"POST"})
      * @OA\Post(summary="add a user")
      * @OA\Response(
@@ -205,6 +232,46 @@ class UserController extends AbstractController
      *     response=JsonResponse::HTTP_NOT_FOUND,
      *     description="User not found"
      * )
+     * @OA\Response(
+     *     response=JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+     *     description="HTTP_INTERNAL_SERVER_ERROR request"
+     * )
+     * @OA\RequestBody(
+     *     description="The user data you want to add",
+     *     required=true,
+     *     @OA\MediaType(
+     *         mediaType="application/Json",
+     *         @OA\Schema(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="name",
+     *                 description="User's name",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="first_name",
+     *                 description="User's first name",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="last_name",
+     *                 description="User's last name",
+     *                 type="string"
+     *             ),
+     *   *             @OA\Property(
+     *                 property="password",
+     *                 description="User's password",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="email",
+     *                 description="User's email address",
+     *                 type="string"
+     *             )
+     *         )
+     *     )
+     * )
+     * @Cache(maxage="3600", public=true, mustRevalidate=true)
      * @OA\Tag(name="User")
      */
     public function add(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
